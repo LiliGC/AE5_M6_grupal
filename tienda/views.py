@@ -1,4 +1,7 @@
 from django.contrib import messages
+from .forms import NewUserForm
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from .forms import ProveedorForm
 from .models import Cliente
@@ -60,6 +63,41 @@ def registroprov(request):
     else:
         form=ProveedorForm() 
         return render(request, 'tienda/registroprov.html', {"form":form}) 
+
+def register_user(request):
+	if request.method == "POST":
+		form = NewUserForm(request.POST)
+		if form.is_valid():
+			user = form.save()
+			login(request, user)
+			messages.success(request, "Registro exitoso." )
+			return redirect('index')
+		messages.error(request, "Registro no exitoso. Información no válida.")
+	form = NewUserForm()
+	return render (request, 'tienda/register_user.html', context={"register_form":form})
+
+def login_user(request):
+	if request.method == "POST":
+		form = AuthenticationForm(request, data=request.POST)
+		if form.is_valid():
+			username = form.cleaned_data.get('username')
+			password = form.cleaned_data.get('password')
+			user = authenticate(username=username, password=password)
+			if user is not None:
+				login(request, user)
+				messages.info(request, f"Tu haz iniciado sesión como {username}.")
+				return redirect('index')
+			else:
+				messages.error(request,"Nombre o contraseña no válidos.")
+		else:
+			messages.error(request,"Nombre o contraseña no válidos.")
+	form = AuthenticationForm()
+	return render(request, 'tienda/login.html',context={"login_form":form})
+
+def logout_user(request):
+	logout(request)
+	messages.info(request, "Haz cerrado sesión exitosamente.") 
+	return redirect('index')
 
 
 
