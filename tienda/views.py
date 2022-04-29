@@ -2,6 +2,7 @@ from django.contrib import messages
 from .forms import NewUserForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .forms import ProveedorForm
 from .models import Cliente
@@ -27,6 +28,7 @@ def confirmacion(request):
     print(nombre, email, mensaje)
     return render(request, 'tienda/confirmacion.html', {"mensaje":"Datos recibidos"})
 
+@login_required
 def clientes(request):
     cliente=Cliente.objects.all().values()
     context = {
@@ -34,6 +36,7 @@ def clientes(request):
     }
     return render(request, 'tienda/clientes.html', context)
 
+@login_required
 def proveedores(request):
     proveedor=Proveedor.objects.all().values()
     context = {
@@ -41,6 +44,7 @@ def proveedores(request):
     }
     return render(request, 'tienda/proveedores.html', context)
 
+@login_required
 def registroprov(request):
 
     form=ProveedorForm()
@@ -64,6 +68,7 @@ def registroprov(request):
         form=ProveedorForm() 
         return render(request, 'tienda/registroprov.html', {"form":form}) 
 
+
 def register_user(request):
 	if request.method == "POST":
 		form = NewUserForm(request.POST)
@@ -75,6 +80,7 @@ def register_user(request):
 		messages.error(request, "Registro no exitoso. Información no válida.")
 	form = NewUserForm()
 	return render (request, 'tienda/register_user.html', context={"register_form":form})
+
 
 def login_user(request):
 	if request.method == "POST":
@@ -94,6 +100,7 @@ def login_user(request):
 	form = AuthenticationForm()
 	return render(request, 'tienda/login.html',context={"login_form":form})
 
+@login_required
 def logout_user(request):
 	logout(request)
 	messages.info(request, "Haz cerrado sesión exitosamente.") 
