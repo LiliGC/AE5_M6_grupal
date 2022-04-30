@@ -3,6 +3,7 @@ from .forms import NewUserForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, redirect
 from .forms import ProveedorForm
 from .models import Cliente
@@ -44,6 +45,7 @@ def proveedores(request):
     }
     return render(request, 'tienda/proveedores.html', context)
 
+@staff_member_required
 @login_required
 def registroprov(request):
 
@@ -92,7 +94,7 @@ def login_user(request):
 			if user is not None:
 				login(request, user)
 				messages.info(request, f"Tu haz iniciado sesión como {username}.")
-				return redirect('index')
+				return redirect('login')
 			else:
 				messages.error(request,"Nombre o contraseña no válidos.")
 		else:
